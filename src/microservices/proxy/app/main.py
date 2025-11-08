@@ -23,7 +23,9 @@ MONOLITH_URL: str = os.getenv("MONOLITH_URL", "http://monolith:8080")
 MOVIES_SERVICE_URL: str = os.getenv("MOVIES_SERVICE_URL", "http://movies-service:8081")
 EVENTS_SERVICE_URL: str = os.getenv("EVENTS_SERVICE_URL", "http://events-service:8082")
 GRADUAL_MIGRATION: bool = os.getenv("GRADUAL_MIGRATION", "false").lower() == "true"
-MOVIES_MIGRATION_PERCENT: int = _parse_percent(os.getenv("MOVIES_MIGRATION_PERCENT"), 100)
+MOVIES_MIGRATION_PERCENT: int = _parse_percent(
+    os.getenv("MOVIES_MIGRATION_PERCENT"), 50
+)
 API_MOVIES = "/api/movies"
 API_USERS = "/api/users"
 
@@ -94,11 +96,13 @@ async def route_movies(req: Request, full_path: str = "") -> Response:
     - Если GRADUAL_MIGRATION=true, с вероятностью MOVIES_MIGRATION_PERCENT -> Movies Service.
     - Иначе -> Monolith.
     """
-    print("-" * 50)
-    print(gradual())
-    target = MONOLITH_URL if gradual() else EVENTS_SERVICE_URL
+    target = MONOLITH_URL if gradual() else MOVIES_SERVICE_URL
 
-    return await _proxy(req, target, f"{API_MOVIES}{full_path}")
+    return await _proxy(
+        request=req,
+        target_base=target,
+        path=f"{API_MOVIES}{full_path}",
+    )
 
 
 @app.api_route(
