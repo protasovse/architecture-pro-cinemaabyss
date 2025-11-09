@@ -7,9 +7,8 @@ from .kafka import KafkaProducer
 import uuid
 
 
-# --- Lifespan-хендлер: инициализация и корректное завершение producer ---
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app_: FastAPI):
     """
     Жизненный цикл приложения:
     - создаём KafkaProducer на старте
@@ -17,11 +16,11 @@ async def lifespan(app: FastAPI):
     """
     producer = KafkaProducer(settings.KAFKA_BOOTSTRAP_SERVERS)
     await producer.start()
-    app.state.producer = producer
+    app_.state.producer = producer
     try:
         yield
     finally:
-        await app.state.producer.stop()
+        await app_.state.producer.stop()
 
 
 app = FastAPI(
@@ -32,11 +31,6 @@ app = FastAPI(
     default_response_class=ORJSONResponse,  # или JSONResponse, если не ставишь orjson
     lifespan=lifespan,
 )
-
-
-def _producer(request: Request) -> KafkaProducer:
-    """Утилита для получения producer из состояния приложения."""
-    return request.app.state.producer
 
 
 @app.get("/api/events/health")
@@ -53,7 +47,7 @@ async def _publish(request: Request, topic: str, payload: dict) -> ProduceResult
         topic: имя Kafka-топика
         payload: сериализуемый словарь события
     """
-    producer = _producer(request)
+    producer = request.app.state.producer
     partition, offset = await producer.send(topic, payload)
     return ProduceResult(partition=partition, offset=offset, event=payload)
 

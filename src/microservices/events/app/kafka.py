@@ -1,7 +1,7 @@
-import asyncio
 import json
 from aiokafka import AIOKafkaProducer
 from typing import Any
+
 
 class KafkaProducer:
     """Лёгкая обёртка над AIOKafkaProducer."""
@@ -14,7 +14,9 @@ class KafkaProducer:
         if self._producer is None:
             self._producer = AIOKafkaProducer(
                 bootstrap_servers=self._bootstrap_servers,
-                value_serializer=lambda v: json.dumps(v, ensure_ascii=False).encode("utf-8"),
+                value_serializer=lambda v: json.dumps(v, ensure_ascii=False).encode(
+                    "utf-8"
+                ),
             )
             await self._producer.start()
 
