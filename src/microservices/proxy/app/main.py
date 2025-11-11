@@ -28,6 +28,8 @@ MOVIES_MIGRATION_PERCENT: int = _parse_percent(
 )
 API_MOVIES = "/api/movies"
 API_USERS = "/api/users"
+API_PAYMENTS = "/api/payments"
+API_SUBSCRIPTIONS = "/api/subscriptions"
 
 # --- Клиент для проксирования (keep-alive, таймауты) ---
 client = httpx.AsyncClient(timeout=httpx.Timeout(5.0, connect=2.0))
@@ -110,4 +112,20 @@ async def route_movies(req: Request, full_path: str = "") -> Response:
 )
 async def route_users(req: Request, full_path: str = "") -> Response:
     """Пользователи пока обслуживаются монолитом."""
+    return await _proxy(req, MONOLITH_URL, f"{API_USERS}{full_path}")
+
+
+@app.api_route(
+    f"{API_PAYMENTS}{{full_path:path}}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"]
+)
+async def route_users(req: Request, full_path: str = "") -> Response:
+    """Платежи пока обслуживаются монолитом."""
+    return await _proxy(req, MONOLITH_URL, f"{API_USERS}{full_path}")
+
+
+@app.api_route(
+    f"{API_SUBSCRIPTIONS}{{full_path:path}}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"]
+)
+async def route_users(req: Request, full_path: str = "") -> Response:
+    """Платежи пока обслуживаются монолитом."""
     return await _proxy(req, MONOLITH_URL, f"{API_USERS}{full_path}")
