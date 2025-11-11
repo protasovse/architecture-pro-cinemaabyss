@@ -1,9 +1,4 @@
 from pydantic_settings import BaseSettings
-from pydantic import Field
-
-
-def _raise():
-    raise ValueError("Invalid settings")
 
 
 class Settings(BaseSettings):
@@ -16,10 +11,10 @@ class Settings(BaseSettings):
         KAFKA_TOPIC_PAYMENTS: топик для событий платежей
     """
 
-    KAFKA_BOOTSTRAP_SERVERS: str = Field(default_factory=_raise)
-    KAFKA_TOPIC_MOVIES: str = Field(default_factory=_raise)
-    KAFKA_TOPIC_USERS: str = Field(default_factory=_raise)
-    KAFKA_TOPIC_PAYMENTS: str = Field(default_factory=_raise)
+    KAFKA_BOOTSTRAP_SERVERS: str
+    KAFKA_TOPIC_MOVIES: str
+    KAFKA_TOPIC_USERS: str
+    KAFKA_TOPIC_PAYMENTS: str
 
     class Config:
         env_file = ".env"
