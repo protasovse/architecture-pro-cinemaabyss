@@ -6,7 +6,7 @@
 интеграционное взаимодействие и единую точку вызова сервисов.
 Результат представьте в виде контейнерной диаграммы в нотации С4.
 Добавьте ссылку на файл в этот шаблон
-[ссылка на файл](ссылка)
+[ссылка на файл](https://disk.yandex.ru/d/S8xLCfY9vl2A1w) ([скриншот](https://disk.yandex.ru/i/yYjrEjwIFHImsA))
 
 
 ## Задание 2
@@ -60,6 +60,17 @@
 Необходимые тесты для проверки этого API вызываются при запуске npm run test:local из папки tests/postman 
 Приложите скриншот тестов и скриншот состояния топиков Kafka http://localhost:8090 
 
+Тесты:
+- [screenshot 1](https://disk.yandex.ru/i/UzXM5cGIPfdizg)
+- [screenshot 2](https://disk.yandex.ru/i/Wz7tBJ6LuOl4Mg)
+- [screenshot 3](https://disk.yandex.ru/i/hGl_y4XN0qNgQA)
+- [screenshot 4](https://disk.yandex.ru/i/pyfu8gkkOWtcVA)
+
+Топики Kafka:
+- [all_topics.png](https://disk.yandex.ru/i/mglbh-qEB5WOhA)
+- [movie-events.png](https://disk.yandex.ru/i/iEEWGsC3l0s6bA)
+- [payment-events.png](https://disk.yandex.ru/i/wH4YUgFp1p76lQ)
+- [user-events.png](https://disk.yandex.ru/i/tskrj5fLBIAEWA)
 
 ## Задание 3
 

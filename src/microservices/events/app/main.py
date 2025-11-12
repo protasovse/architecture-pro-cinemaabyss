@@ -1,3 +1,4 @@
+import logging
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.responses import ORJSONResponse
@@ -5,6 +6,9 @@ from .events.schemas import MovieEvent, UserEvent, PaymentEvent, ProduceResult
 from .settings import settings
 from .kafka import KafkaProducer
 import uuid
+
+
+logger = logging.getLogger(__name__)
 
 
 @asynccontextmanager
@@ -48,7 +52,10 @@ async def _publish(request: Request, topic: str, payload: dict) -> ProduceResult
         payload: сериализуемый словарь события
     """
     producer = request.app.state.producer
+    logger.info(f"------\nОтправляем в топик: {topic}, payload: {payload}")
     partition, offset = await producer.send(topic, payload)
+    result = ProduceResult(partition=partition, offset=offset, event=payload)
+    logger.info(f"Результат: {result.model_dump_json()}\n------")
     return ProduceResult(partition=partition, offset=offset, event=payload)
 
 
