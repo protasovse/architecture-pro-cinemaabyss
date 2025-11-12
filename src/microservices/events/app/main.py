@@ -8,7 +8,7 @@ from .kafka import KafkaProducer
 import uuid
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("uvicorn.error")
 
 
 @asynccontextmanager
