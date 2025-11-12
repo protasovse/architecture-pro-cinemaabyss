@@ -116,16 +116,18 @@ async def route_users(req: Request, full_path: str = "") -> Response:
 
 
 @app.api_route(
-    f"{API_PAYMENTS}{{full_path:path}}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"]
+    f"{API_PAYMENTS}{{full_path:path}}",
+    methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
 )
-async def route_users(req: Request, full_path: str = "") -> Response:
+async def route_payments(req: Request, full_path: str = "") -> Response:
     """Платежи пока обслуживаются монолитом."""
-    return await _proxy(req, MONOLITH_URL, f"{API_USERS}{full_path}")
+    return await _proxy(req, MONOLITH_URL, f"{API_PAYMENTS}{full_path}")
 
 
 @app.api_route(
-    f"{API_SUBSCRIPTIONS}{{full_path:path}}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"]
+    f"{API_SUBSCRIPTIONS}{{full_path:path}}",
+    methods=["GET", "POST", "PUT", "PATCH", "DELETE"],
 )
-async def route_users(req: Request, full_path: str = "") -> Response:
+async def route_subscriptions(req: Request, full_path: str = "") -> Response:
     """Платежи пока обслуживаются монолитом."""
-    return await _proxy(req, MONOLITH_URL, f"{API_USERS}{full_path}")
+    return await _proxy(req, MONOLITH_URL, f"{API_SUBSCRIPTIONS}{full_path}")
