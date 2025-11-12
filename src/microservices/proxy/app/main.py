@@ -89,20 +89,29 @@ def gradual() -> bool:
     return False
 
 
+@app.get("/api/movies/health")
+async def movies_health(req: Request) -> Response:
+    """health check только для микросервиса"""
+    return await _proxy(
+        request=req, target_base=MOVIES_SERVICE_URL, path="/api/movies/health"
+    )
+
+
 @app.api_route(
     f"{API_MOVIES}{{full_path:path}}", methods=["GET", "POST", "PUT", "PATCH", "DELETE"]
 )
 async def route_movies(req: Request, full_path: str = "") -> Response:
-    """Маршрут ловит /api/movies и все подпути"""
+    """
+    Канареечная маршрутизация:
+    - Если GRADUAL_MIGRATION=true, с вероятностью MOVIES_MIGRATION_PERCENT -> Movies Service.
+    - Иначе -> Monolith.
+    """
     target = MONOLITH_URL if gradual() else MOVIES_SERVICE_URL
-
-    # Убираем двойные слэши
-    full_url = f"{API_MOVIES}/{full_path}".replace("//", "/")
 
     return await _proxy(
         request=req,
         target_base=target,
-        path=full_url,
+        path=f"{API_MOVIES}{full_path}",
     )
 
 
