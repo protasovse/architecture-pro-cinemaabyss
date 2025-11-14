@@ -1,0 +1,56 @@
+@startuml
+' =========================
+' C4-PlantUML: Container diagram — MVP (Monolith + Movies + Events Service + Kafka)
+' =========================
+!include ./libs/C4_Container.puml
+
+LAYOUT_TOP_DOWN()
+SHOW_PERSON_OUTLINE()
+
+' --- Persons ---
+Person(user, "Пользователь", "Web/Mobile клиент")
+
+' --- System Boundary ---
+System_Boundary(ca, "CinemaAbyss (MVP)") {
+  Container(gw, "Ingress / API Gateway", "K8s Ingress / Kong", "Единая точка входа. JWT, маршрутизация по префиксам")
+
+  ' --- Monolith ---
+  Container(monolith, "Cinema Monolith", "Go + REST", "IAM, Billing/Payments, Subscriptions, Ratings (внутри одного сервиса)")
+  ContainerDb(monodb, "Monolith DB", "PostgreSQL", "users, subscriptions, invoices, payments, ratings, ...")
+
+  ' --- Extracted Microservice ---
+  Container(movies, "Movies / Catalog Service", "Go + REST", "Метаданные тайтлов: videos, genres, actors")
+  ContainerDb(moviesdb, "Movies DB", "PostgreSQL", "videos, genres, actors, links")
+
+  ' --- Events Service (Python) ---
+  Container(events, "Events Service", "Python (FastAPI + aiokafka)", "HTTP -> Kafka роутер событий (movies/users/payments)")
+
+  ' --- Event Bus ---
+  ContainerQueue(kafka, "Kafka", "Event Streaming", "Топики: movies.events.v1, users.events.v1, billing.payments.v1")
+}
+
+' --- External Systems ---
+System_Ext(payprov, "Payment Provider", "Acquirer/PSP", "Эквайринг, статусы платежей, webhooks")
+
+' --- Relations (client to edge) ---
+Rel(user, gw, "HTTPS")
+Rel(gw, movies, "REST: /api/movies/*")
+Rel(gw, monolith, "REST: /api/* (прочее)")
+Rel(gw, events, "REST: /api/events/*")
+
+' --- Data stores ---
+Rel(monolith, monodb, "SQL")
+Rel(movies, moviesdb, "SQL")
+
+' --- Payments flow ---
+Rel(payprov, monolith, "Webhook: payment status")
+Rel(monolith, kafka, "publish: SubscriptionActivated / RatingGiven (опц.)")
+
+' --- Events Service publishes to Kafka ---
+Rel(events, kafka, "publish: MovieViewed/RatingGiven -> movies.events.v1 UserRegistered/UserLoggedIn -> users.events.v1 PaymentSucceeded/Failed -> billing.payments.v1")
+
+' --- Consumers (минимальные) ---
+Rel(kafka, monolith, "consume: billing.payments.v1 (Subscriptions)")
+Rel(kafka, movies, "consume: movies.events.v1 (опц. агрегаты)")
+
+@enduml
